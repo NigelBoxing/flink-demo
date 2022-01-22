@@ -4,12 +4,13 @@ package org.karakarua;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
 
 import java.util.Arrays;
 
-public class WordCountOfDataStream3 {
+public class WordCountOfDataStream4 {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> source = env.readTextFile("src/main/resources/words.txt");
@@ -23,11 +24,24 @@ public class WordCountOfDataStream3 {
                         Arrays.stream(value.split(" ")).forEach(str -> out.collect(Tuple2.of(str, 1)));
                     }
                 })
+                // 设置算子的并行度
+                .setParallelism(3)
                 .keyBy(t -> t.f0)
-                // 使用Reduce的方式计算sum
-                .reduce((value1, value2) -> Tuple2.of(value1.f0,value1.f1+value2.f1))
+                // 使用keyedFunction的方式计算sum
+                .process(new KeyedProcessFunction<String, Tuple2<String, Integer>, Tuple2<String, Integer>>() {
+                    private int sum = 0;
+
+                    @Override
+                    public void processElement(Tuple2<String, Integer> value, KeyedProcessFunction<String, Tuple2<String, Integer>, Tuple2<String, Integer>>.Context ctx, Collector<Tuple2<String, Integer>> out) {
+                        String key = ctx.getCurrentKey();
+                        sum += value.f1;
+                        System.out.println("processing value = " + value + ", sum = " + sum);
+                        out.collect(Tuple2.of(key, sum));
+                    }
+                })
+                .setParallelism(2)
                 .print();
 
-        env.execute("Word Count3");
+        env.execute("Word Count4");
     }
 }

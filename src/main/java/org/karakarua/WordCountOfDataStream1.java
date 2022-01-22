@@ -1,18 +1,19 @@
 package org.karakarua;
 
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.util.Collector;
 
 public class WordCountOfDataStream1 {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> source = env.readTextFile("src/main/resources/words.txt");
+        // lambda表达式方式
         source
-                .flatMap((String s, Collector<String> out) -> {
-                    String[] words = s.split(" ");
+                .flatMap((FlatMapFunction<String, String>) (value, out) -> {
+                    String[] words = value.split(" ");
                     for (String word : words) {
                         out.collect(word);
                     }

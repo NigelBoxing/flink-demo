@@ -16,6 +16,7 @@ public class WordCountOfDataStream2 {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> source = env.readTextFile("src/main/resources/words.txt");
         source
+                // RichFunction方式
                 .flatMap(new RichFlatMapFunction<String, Tuple2<String, Integer>>() {
                     String jobVariable = null;
                     @Override
