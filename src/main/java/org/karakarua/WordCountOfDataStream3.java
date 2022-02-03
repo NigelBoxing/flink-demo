@@ -14,7 +14,7 @@ public class WordCountOfDataStream3 {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> source = env.readTextFile("src/main/resources/words.txt");
         source
-                // processFunction方式
+                // processFunction方式，继承于abstractRichFunction
                 .process(new ProcessFunction<String, Tuple2<String, Integer>>() {
                     @Override
                     public void processElement(String value, ProcessFunction<String, Tuple2<String, Integer>>.Context ctx, Collector<Tuple2<String, Integer>> out) {

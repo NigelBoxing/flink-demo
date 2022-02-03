@@ -20,7 +20,7 @@ public class WordCountOfDataStream2 {
                 .flatMap(new RichFlatMapFunction<String, Tuple2<String, Integer>>() {
                     String jobVariable = null;
                     @Override
-                    public void open(Configuration parameters) throws Exception {   // 算子调用前的初始化工作，每次处理都会调用
+                    public void open(Configuration parameters) throws Exception {   // 算子调用前的初始化工作，每次处理前都会调用
                         super.open(parameters);
                         jobVariable = "my job: ";
                     }

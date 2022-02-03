@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 public class WordCountOfDataSet {
     public static void main(String[] args) throws Exception {
+        // 批处理版本的wordCount
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         DataSource<String> source = env.readTextFile("src/main/resources/words.txt");
         source

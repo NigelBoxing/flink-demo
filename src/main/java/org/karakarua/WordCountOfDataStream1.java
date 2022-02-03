@@ -12,6 +12,7 @@ public class WordCountOfDataStream1 {
         DataStreamSource<String> source = env.readTextFile("src/main/resources/words.txt");
         // lambda表达式方式
         source
+                // lambda形式的flatMap和Map需要通过returns确定返回值类型
                 .flatMap((FlatMapFunction<String, String>) (value, out) -> {
                     String[] words = value.split(" ");
                     for (String word : words) {
