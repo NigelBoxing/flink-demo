@@ -1,4 +1,4 @@
-package org.karakarua;
+package org.karakarua.quickstart;
 
 import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.ExecutionEnvironment;

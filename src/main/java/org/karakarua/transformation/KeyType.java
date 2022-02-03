@@ -1,4 +1,4 @@
-package org.karakarua;
+package org.karakarua.transformation;
 
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -8,13 +8,12 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
 
 import java.util.Arrays;
 
-public class KeyByOperatorTest {
+public class KeyType {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> source = env.readTextFile("src/main/resources/words.txt");

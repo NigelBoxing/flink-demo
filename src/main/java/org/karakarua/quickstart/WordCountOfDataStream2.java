@@ -1,4 +1,4 @@
-package org.karakarua;
+package org.karakarua.quickstart;
 
 
 import org.apache.flink.api.common.functions.RichFlatMapFunction;

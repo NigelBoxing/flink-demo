@@ -1,4 +1,4 @@
-package org.karakarua;
+package org.karakarua.quickstart;
 
 
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -14,6 +14,8 @@ public class WordCountOfDataStream4 {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<String> source = env.readTextFile("src/main/resources/words.txt");
+        // 可以统一设定整个环境（所有的算子）的并行度，也可以对算子单独设定并行度
+        // env.setParallelism(3);
         source
                 // processFunction方式
                 .process(new ProcessFunction<String, Tuple2<String, Integer>>() {
@@ -24,7 +26,7 @@ public class WordCountOfDataStream4 {
                         Arrays.stream(value.split(" ")).forEach(str -> out.collect(Tuple2.of(str, 1)));
                     }
                 })
-                // 设置算子的并行度
+                // 单独设置算子的并行度
                 .setParallelism(3)
                 .keyBy(t -> t.f0)
                 // 使用keyedFunction的方式计算sum
