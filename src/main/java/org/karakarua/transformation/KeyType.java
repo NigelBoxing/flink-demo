@@ -1,6 +1,7 @@
 package org.karakarua.transformation;
 
 
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -10,6 +11,7 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.util.Collector;
+import org.karakarua.domain.UserInfo;
 
 import java.util.Arrays;
 
@@ -32,23 +34,37 @@ public class KeyType {
         // 目前以上两种方式均在1.12及后续版本被抛弃，不建议使用
         KeyedStream<Tuple2<String, Integer>, Tuple> keyedStream1 = wordMap.keyBy("f0");
         KeyedStream<Tuple2<String, Integer>, Tuple> keyedStream2 = wordMap.keyBy(0);
-        KeyedStream<Tuple2<String, Integer>, Tuple> keyedStream3 = wordMap.keyBy("f0","f1");
+        KeyedStream<Tuple2<String, Integer>, Tuple> keyedStream3 = wordMap.keyBy("f0", "f1");
 
         // keyBy(int... fields)和keyBy(String... fields)返回的KeyedStream的KEY（KeyedStream的第二个泛型）是Tuple，形式为Tuple<key_type>
         // 输出 Java Tuple1<String>
         TypeInformation<Tuple> keyType = keyedStream1.getKeyType();
-        System.out.println(keyType);
+        System.out.println("使用keyBy(String... fields), keyType = " + keyType);
         // 输出 Java Tuple1<String>
         TypeInformation<Tuple> keyType1 = keyedStream2.getKeyType();
-        System.out.println(keyType1);
+        System.out.println("使用keyBy(int... fields), keyType = " + keyType1);
         // 输出 Java Tuple2<String, Integer>
         TypeInformation<Tuple> keyType2 = keyedStream3.getKeyType();
-        System.out.println(keyType2);
+        System.out.println("使用keyBy(String... fields), keyType = " + keyType2);
 
         // 推荐使用KeySelector的方式
         KeyedStream<Tuple2<String, Integer>, String> keyedWords = wordMap.keyBy(t -> t.f0);
         // 输出String
-        System.out.println(keyedWords.getKeyType());
+        System.out.println("使用keyBy(KeySelector), keyType = " + keyedWords.getKeyType());
+
+        DataStreamSource<String> users = env.readTextFile("src/main/resources/users.txt");
+        SingleOutputStreamOperator<UserInfo> userMap = users.flatMap((FlatMapFunction<String, UserInfo>) (value, out) -> {
+            String[] userInfo = value.split(" ");
+            String name = userInfo[0];
+            String password = userInfo[1];
+            UserInfo user = new UserInfo(name, password);
+            out.collect(user);
+        }).returns(TypeInformation.of(UserInfo.class));
+        KeyedStream<UserInfo, Tuple> keyedUsersTuple = userMap.keyBy("username");
+        // 输出Java Tuple1<String>
+        System.out.println("使用keyBy(String... fields), keyType = " + keyedUsersTuple.getKeyType());
+        // 输出 String
+        System.out.println("使用keyBy(KeySelector), keyType = " + userMap.keyBy(user -> user.getUsername()).getKeyType());
         env.execute("Word Count4");
     }
 }
