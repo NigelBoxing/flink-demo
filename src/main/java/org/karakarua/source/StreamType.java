@@ -22,6 +22,7 @@ public class StreamType {
         TypeInformation<Tuple> tuple = Types.TUPLE(Types.STRING, Types.INT);
         // 输出 class org.apache.flink.api.java.tuple.Tuple2
         System.out.println(tuple.getTypeClass());
+
         // 自定义POJO交由Flink 序列化后可以转换为流
         TypeInformation<UserInfo> userType = TypeInformation.of(UserInfo.class);
         // 输出 class org.karakarua.domain.UserInfo
@@ -42,8 +43,10 @@ public class StreamType {
         }.getTypeInfo();
         // 输出 class org.karakarua.domain.UserInfo
         System.out.println(userTypeHint.getTypeClass());
+        // 输出 field 的个数
+        System.out.println(userTypeHint.getArity());
 
-        // 一个TypeInformation的几个关键点：使用的class类型、使用的序列化工具、使用的比较器，
+        // 一个TypeInformation的几个关键点：使用的class类型、使用的序列化工具（可用于I/O传输）、使用的比较器，
         // 以Flink的String类型为例，它属于BasicTypeInfo，对应于BasicTypeInfo.STRING_TYPE_INFO ，
         // 使用了Java的String类型、flink定义的序列化工具StringSerializer和flink定义的比较器StringComparator
         /*

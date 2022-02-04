@@ -4,7 +4,7 @@ package org.karakarua.domain;
  * 定义一个可以被处理为流的POJO
  * Flink要求POJO必须具备
  * <ul>
- *     <li>公有且独立的类（public、没有非静态内部类）</li></li>
+ *     <li>公有且独立的类（public、没有非静态内部类）</li>
  *     <li>一个无参的构造器</li>
  *     <li>所有成员的get方法和set方法，且方法名遵循JavaBean命名规范，及getXxx形式</li>
  * </ul>
