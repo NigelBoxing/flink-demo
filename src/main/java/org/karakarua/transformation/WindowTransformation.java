@@ -62,7 +62,8 @@ public class WindowTransformation {
 
 
         SingleOutputStreamOperator<String> windowApply = keyedStream
-                .window(TumblingProcessingTimeWindows.of(Time.seconds(10)))
+                // 带有偏移值的滚动窗口，表示从当前所在的小时的第2秒开始，每隔10秒滚动一个窗口，比如现在20:05:08，则第一次运行会在20:00:02 + n * 10 = 20:05:12开始运行
+                .window(TumblingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(2)))
                 .apply(new WindowFunction<Tuple2<String, Integer>, String, String, TimeWindow>() {
                     // 写在重载的apply方法外面（apply算子范围内）是针对相同key的所有TumblingWindow的聚合
                     // AtomicInteger sum = new AtomicInteger();
@@ -113,7 +114,7 @@ public class WindowTransformation {
                     String outStr =
                             "当前窗口：" + Tuple2.of(key, sum) + ", maxTimestamp: " + maxTime;
                     out.collect(outStr);
-                });
+                }).returns(Types.STRING);
         countWindowApply.print();
 
         env.execute("Window Test");
