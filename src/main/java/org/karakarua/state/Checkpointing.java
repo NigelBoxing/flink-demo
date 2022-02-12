@@ -1,5 +1,6 @@
 package org.karakarua.state;
 
+import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 public class Checkpointing {
@@ -7,5 +8,6 @@ public class Checkpointing {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.enableCheckpointing(60000); // 开启checkpoint,并且设定checkpoint间隔为1分钟
         env.getCheckpointConfig().setCheckpointTimeout(600000); // 设定checkpoint运行时间上线为10分钟
+        env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
     }
 }
