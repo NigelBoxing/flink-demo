@@ -12,11 +12,14 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.AssignerWithPeriodicWatermarks;
+import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.watermark.Watermark;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.util.Collector;
+import org.apache.flink.util.OutputTag;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -88,9 +91,10 @@ public class WaterMarkStrategy {
                     }
                 });
         // 自定义实现 PunctuatedWatermarks，允许包含hello内容的流延迟2秒到达，即仅遇到WindowEndTime + 2s的包含hello的消息才关闭窗口。
-        WatermarkStrategy<String> watermarkStrategy = context -> new PunctuatedWatermarks(2000);
-        SingleOutputStreamOperator<String> watermarks2 = source.assignTimestampsAndWatermarks(watermarkStrategy.withTimestampAssigner(((element, recordTimestamp) -> getEventTime(element))));
-        watermarks2
+        WatermarkStrategy<String> punctuatedWatermark = context -> new PunctuatedWatermarks(2000);
+        SingleOutputStreamOperator<String> watermarks2 = source.assignTimestampsAndWatermarks(punctuatedWatermark.withTimestampAssigner(((element, recordTimestamp) -> getEventTime(element))));
+
+        SingleOutputStreamOperator<String> transform = watermarks2
                 .map((MapFunction<String, Tuple2<String, Integer>>) value -> Tuple2.of(value.split(",")[0], 1))
                 .returns(Types.TUPLE(Types.STRING, Types.INT))
                 .keyBy(t -> t.f0)
@@ -109,8 +113,53 @@ public class WaterMarkStrategy {
                             "当前窗口：" + Tuple2.of(key, sum) + ", windowStart: " + st + ", " +
                                     "windowEnd: " + et;
                     out.collect(outStr);
-                }).returns(Types.STRING)
+                }).returns(Types.STRING);
+//        transform.print();
+
+        OutputTag<Tuple2<String, Integer>> LATE_DATA = new OutputTag<>("late_data");
+        SingleOutputStreamOperator<String> transform2 = watermarks
+                .map((MapFunction<String, Tuple2<String, Integer>>) value -> Tuple2.of(value.split(",")[0], 1))
+                .returns(Types.TUPLE(Types.STRING, Types.INT))
+                .keyBy(t -> t.f0)
+                .window(SlidingEventTimeWindows.of(Time.seconds(10), Time.seconds(5)))
+                // allowedLateness和sideOutputLateData设定窗口结束时间后的数据（迟到数据）的处理方式，二者可以同时使用，也可以使用其中一个
+                // allowedLateness设定窗口结束时间后2秒内的迟到数据 仍然会被归到原窗口中计算
+                // 当eventTime >= 允许的lateness时，窗口就真的关闭了，此时再来的迟到的数据（即窗口结束时间后2秒内再来的数据）如果没有被扔到旁路输出则直接丢弃。
+                .allowedLateness(Time.seconds(2))
+                // 当eventTime >= 允许的lateness时，窗口就真的关闭了，此时再来的迟到的数据可以设定被扔到旁路输出。
+                // 与allowedLateness联合使用时，表示比允许的lateness还晚到的数据就扔到旁路输出，单独使用时，表面窗口关闭后的迟到使用直接扔到旁路输出
+                // 或者统一理解为表示比允许的lateness还晚到的数据就扔到旁路输出，只是没有allowedLateness而单独使用时可理解为Lateness=0L
+                .sideOutputLateData(LATE_DATA)
+                // 注意：下面process是针对非延迟的数据的处理逻辑，并不是针对allowedLateness和sideOutputLateData的迟到数据处理逻辑。
+                .process(new ProcessWindowFunction<Tuple2<String, Integer>, String, String, TimeWindow>() {
+                    @Override
+                    public void process(String key, ProcessWindowFunction<Tuple2<String, Integer>,
+                            String, String, TimeWindow>.Context context, Iterable<Tuple2<String, Integer>> elements, Collector<String> out) {
+                        // sum 写在重载的apply方法里面是针对相同key的当前TumblingWindow（只有一个Window）的聚合
+                        AtomicInteger sum = new AtomicInteger();
+                        elements.forEach(value -> sum.addAndGet(value.f1));
+                        SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                        // 时间窗口可以取窗口的开始时间和结束时间
+                        long start = context.window().getStart();
+                        long end = context.window().getEnd();
+                        long currentWatermark = context.currentWatermark();
+                        String st = format1.format(start);
+                        String et = format1.format(end);
+                        String watermark = format1.format(currentWatermark);
+                        String outStr =
+                                "当前窗口：" + Tuple2.of(key, sum) + ", windowStart: " + st + ", " +
+                                        "windowEnd: " + et + ",当前watermark: " + watermark;
+                        out.collect(outStr);
+                    }
+                });
+        // 针对非迟到的数据
+        transform2.print();
+        // 针对旁路输出中的迟到数据的处理逻辑
+        transform2.getSideOutput(LATE_DATA)
+                .map((MapFunction<Tuple2<String, Integer>, String>) value -> String.format("迟到数据：%s", value.toString()))
+                .returns(Types.STRING)
                 .print();
+        System.out.println(env.getExecutionPlan());
         env.execute("WaterMark Test");
     }
 
