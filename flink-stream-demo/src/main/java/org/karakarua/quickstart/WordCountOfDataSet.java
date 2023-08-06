@@ -12,7 +12,7 @@ public class WordCountOfDataSet {
     public static void main(String[] args) throws Exception {
         // 批处理版本的wordCount
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-        DataSource<String> source = env.readTextFile("src/main/resources/words.txt");
+        DataSource<String> source = env.readTextFile("flink-stream-demo/src/main/resources/words.txt");
         source
                 .flatMap((String s, Collector<String> collector) -> {
                     String[] words = s.split(" ");

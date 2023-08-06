@@ -9,7 +9,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 public class WordCountOfDataStream1 {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStreamSource<String> source = env.readTextFile("src/main/resources/words.txt");
+        DataStreamSource<String> source = env.readTextFile("flink-stream-demo/src/main/resources/words.txt");
         // lambda表达式方式
         source
                 // lambda形式的flatMap和Map需要通过returns确定返回值类型

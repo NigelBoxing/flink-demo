@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class WordCountOfDataStream3 {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStreamSource<String> source = env.readTextFile("src/main/resources/words.txt");
+        DataStreamSource<String> source = env.readTextFile("flink-stream-demo/src/main/resources/words.txt");
         source
                 // processFunction方式，继承于abstractRichFunction
                 .process(new ProcessFunction<String, Tuple2<String, Integer>>() {

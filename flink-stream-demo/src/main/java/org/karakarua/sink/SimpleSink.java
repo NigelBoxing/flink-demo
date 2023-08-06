@@ -40,7 +40,7 @@ public class SimpleSink {
                 // sink的并行度决定了输出的形式：并行度=1，输出单一文件count.txt；并行度>1 目录count.txt下则有N个文件（N取决于实际并行度大小，默认cpu core的数量）
                 // 注意：当并行度>1时，目录count.txt下的N个文件中可能有空文件，原因是key的数量小于并行度，并不能全部分散到全部文件
                 // 目前writeAsText已被弃用
-                .writeAsText("src/main/resources/count.txt", FileSystem.WriteMode.OVERWRITE)
+                .writeAsText("flink-stream-demo/src/main/resources/count.txt", FileSystem.WriteMode.OVERWRITE)
                 .setParallelism(1);
         // writeAsCsv只适用于输出Tuple，目前writeAsCsv已被弃用
         // source.writeAsCsv("src/main/source/source.txt");

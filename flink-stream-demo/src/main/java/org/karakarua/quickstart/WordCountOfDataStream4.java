@@ -13,7 +13,7 @@ import java.util.Arrays;
 public class WordCountOfDataStream4 {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStreamSource<String> source = env.readTextFile("src/main/resources/words.txt");
+        DataStreamSource<String> source = env.readTextFile("flink-stream-demo/src/main/resources/words.txt");
         // 可以统一设定整个环境（所有的算子）的并行度，也可以对算子单独设定并行度
         // env.setParallelism(3);
         source

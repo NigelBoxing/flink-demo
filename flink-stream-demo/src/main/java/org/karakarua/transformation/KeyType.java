@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class KeyType {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStreamSource<String> source = env.readTextFile("src/main/resources/words.txt");
+        DataStreamSource<String> source = env.readTextFile("flink-stream-demo/src/main/resources/words.txt");
         SingleOutputStreamOperator<Tuple2<String, Integer>> wordMap = source
                 .process(new ProcessFunction<String, Tuple2<String, Integer>>() {
                     @Override
@@ -52,7 +52,7 @@ public class KeyType {
         // 输出String
         System.out.println("使用keyBy(KeySelector), keyType = " + keyedWords.getKeyType());
 
-        DataStreamSource<String> users = env.readTextFile("src/main/resources/users.txt");
+        DataStreamSource<String> users = env.readTextFile("flink-stream-demo/src/main/resources/users.txt");
         SingleOutputStreamOperator<UserInfo> userMap = users.flatMap((FlatMapFunction<String, UserInfo>) (value, out) -> {
             String[] userInfo = value.split(" ");
             String name = userInfo[0];
