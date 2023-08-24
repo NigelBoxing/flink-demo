@@ -29,7 +29,7 @@ under the License.
     </modules>
     <packaging>pom</packaging>
 
-    <name>Flink Walkthrough DataStream Java</name>
+    <name>flink demo</name>
     <url>https://flink.apache.org</url>
 
 
