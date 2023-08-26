@@ -21,11 +21,12 @@ under the License.
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.karakarua</groupId>
-    <artifactId>flinkDemo</artifactId>
+    <artifactId>flink-demo</artifactId>
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>flink-stream-demo</module>
         <module>flink-table-demo</module>
+        <module>protobuf-resources</module>
     </modules>
     <packaging>pom</packaging>
 

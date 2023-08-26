@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+option java_outer_classname = "VisitLog";
+
+message request {
+  required string requestId = 1;
+  optional visitTime visitTimeRange = 2;
+
+}
+message visitTime {
+  optional int64 startTime = 1;
+  optional int64 endTIme = 2;
+}
