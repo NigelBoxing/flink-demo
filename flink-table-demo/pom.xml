@@ -14,7 +14,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <modules>
-    <module>flink-table-client</module>
+    <module>flink-basic-demo</module>
     <module>flink-table-formats</module>
     <module>flink-table-connectors</module>
   </modules>
@@ -30,6 +30,7 @@
     <scala.version>2.11</scala.version>
     <flink.version>1.14.5</flink.version>
     <slf4j-api.version>1.7.30</slf4j-api.version>
+    <hadoop.version>2.10.2</hadoop.version>
   </properties>
 
   <dependencies>
@@ -73,6 +74,16 @@
       <groupId>org.apache.flink</groupId>
       <artifactId>flink-clients_${scala.version}</artifactId>
       <version>${flink.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-common</artifactId>
+      <version>${hadoop.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-hdfs</artifactId>
+      <version>${hadoop.version}</version>
     </dependency>
   </dependencies>
 

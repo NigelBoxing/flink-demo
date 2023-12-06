@@ -9,6 +9,15 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>flink-table-client</artifactId>
+    <artifactId>flink-basic-demo</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.paimon</groupId>
+            <artifactId>paimon-flink-1.14</artifactId>
+            <version>0.5.0-incubating</version>
+        </dependency>
+
+    </dependencies>
 
 </project>
