@@ -1,18 +1,25 @@
 package org.karakarua.client;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.catalog.Catalog;
+import org.apache.flink.table.catalog.CatalogBaseTable;
+import org.apache.flink.table.catalog.ObjectPath;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 public class PaimonDemo {
     public static void main(String[] args) throws Exception {
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        Configuration conf = new Configuration();
+        conf.setInteger("rest.port", 8081);     // 指定flink webui端口
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment(conf);
         StreamTableEnvironment tableEnv = StreamTableEnvironment.create(env);
         String classpath = PaimonDemo.class.getClassLoader().getResource("").getPath();
+
+
 
         String demoSourceSql =
                 FileUtils.readFileToString(new File(classpath.concat("kafka_source.sql")), StandardCharsets.UTF_8);

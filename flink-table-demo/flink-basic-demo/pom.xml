@@ -17,6 +17,11 @@
             <artifactId>paimon-flink-1.14</artifactId>
             <version>0.5.0-incubating</version>
         </dependency>
+        <dependency>
+            <groupId>com.guicedee.services</groupId>
+            <artifactId>slf4j</artifactId>
+            <version>1.1.1.7</version>
+        </dependency>
 
     </dependencies>
 
